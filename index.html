@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Study Planner</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+  <div class="app-shell">
+    <header>
+      <div class="page-header">
+        <div>
+          <h1>Student Study Planner</h1>
+          <p>Smart scheduling and task tracking for better exam preparation.</p>
+        </div>
+        <div class="header-actions">
+          <span id="userGreeting" class="user-greeting"></span>
+          <button id="toggleThemeBtn" class="secondary">Dark Mode</button>
+          <button id="logoutBtn" class="secondary">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="dashboard panel">
+        <div class="panel-header">
+          <h2>Dashboard</h2>
+          <button id="resetDataBtn" class="danger">Reset Data</button>
+        </div>
+        <div class="dashboard-cards">
+          <div class="card">
+            <h3>Today's Tasks</h3>
+            <ul id="todayTasks"></ul>
+          </div>
+          <div class="card">
+            <h3>Progress</h3>
+            <div class="progress-block">
+              <span id="completedCount">0</span> / <span id="totalCount">0</span> completed
+            </div>
+            <div class="progress-bar">
+              <div id="progressFill"></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Upcoming Deadlines</h3>
+            <ul id="deadlineList"></ul>
+          </div>
+          <div class="card">
+            <h3>Recommendation</h3>
+            <p id="recommendationText">Add subjects and tasks to get focused study advice.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Profile & Subjects</h2>
+        <form id="profileForm">
+          <div class="form-row">
+            <label for="studentName">Name</label>
+            <input type="text" id="studentName" placeholder="Your name" required />
+          </div>
+          <div class="form-row">
+            <label for="weeklyHours">Weekly Study Hours</label>
+            <input type="number" id="weeklyHours" min="1" value="15" required />
+          </div>
+          <button type="submit" class="primary">Save Profile</button>
+        </form>
+
+        <div class="divider"></div>
+
+        <form id="subjectForm">
+          <h3>Add Subject</h3>
+          <div class="form-row">
+            <label for="subjectName">Subject</label>
+            <input type="text" id="subjectName" placeholder="e.g. Mathematics" required />
+          </div>
+          <div class="form-row">
+            <label for="priority">Priority</label>
+            <select id="priority">
+              <option value="3">High</option>
+              <option value="2" selected>Medium</option>
+              <option value="1">Low</option>
+            </select>
+          </div>
+          <button type="submit" class="primary">Add Subject</button>
+        </form>
+
+        <div class="list-panel">
+          <h3>Subjects</h3>
+          <ul id="subjectList" class="list"></ul>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Tasks & Deadlines</h2>
+        <form id="taskForm">
+          <div class="form-row">
+            <label for="taskTitle">Task / Topic</label>
+            <input type="text" id="taskTitle" placeholder="Study Chapter 3" required />
+          </div>
+          <div class="form-row">
+            <label for="taskSubject">Subject</label>
+            <select id="taskSubject"></select>
+          </div>
+          <div class="form-row">
+            <label for="dueDate">Due Date</label>
+            <input type="date" id="dueDate" required />
+          </div>
+          <div class="form-row">
+            <label for="estimatedHours">Estimated Hours</label>
+            <input type="number" id="estimatedHours" min="0.5" step="0.5" value="1" required />
+          </div>
+          <button type="submit" class="primary">Add Task</button>
+        </form>
+
+        <div class="list-panel">
+          <h3>All Tasks</h3>
+          <ul id="taskList" class="list"></ul>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>How to Use</h2>
+        <ol class="guide-list">
+          <li>Save your profile with your name and weekly study hours.</li>
+          <li>Add subjects and set their priority levels.</li>
+          <li>Create tasks with deadlines and estimated study time.</li>
+          <li>Generate your personalized schedule and follow today’s tasks.</li>
+          <li>Mark tasks complete and rebalance schedule when plans change.</li>
+        </ol>
+      </section>
+
+      <section class="panel">
+        <h2>Generated Schedule</h2>
+        <div class="schedule-actions">
+          <button id="generateScheduleBtn" class="primary">Generate / Refresh Schedule</button>
+          <button id="rescheduleBtn" class="secondary">Rebalance Missed Work</button>
+        </div>
+        <div class="schedule-output">
+          <ul id="scheduleList"></ul>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-auth-compat.js"></script>
+  <script>
+    // Initialize Firebase (CDN version)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCfBQI_rn2PhNZV1dI9uHGSvLNB5nCuefE",
+      authDomain: "soft-ahh.firebaseapp.com",
+      projectId: "soft-ahh",
+      storageBucket: "soft-ahh.firebasestorage.app",
+      messagingSenderId: "792389467882",
+      appId: "1:792389467882:web:bf54bf072d1bbb9cc72193"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    window.firebaseAuth = firebase.auth();
+  </script>
+
+  <script type="module" src="js/planner.js"></script>
+</body>
+
+</html>

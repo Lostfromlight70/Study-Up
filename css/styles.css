@@ -1,0 +1,385 @@
+:root {
+    --bg: #f5f7fb;
+    --panel: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --accent: #4f46e5;
+    --accent-strong: #4338ca;
+    --danger: #dc2626;
+    --border: #e5e7eb;
+}
+
+body.dark-mode {
+    background: #111827;
+    color: #e5e7eb;
+}
+
+body.dark-mode .app-shell,
+body.dark-mode .panel,
+body.dark-mode .card,
+body.dark-mode .auth-panel,
+body.dark-mode .auth-box {
+    background: #1f2937;
+    border-color: #374151;
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode button {
+    border-color: #4b5563;
+    background: #111827;
+    color: #e5e7eb;
+}
+
+body.dark-mode button.primary {
+    background: #6366f1;
+}
+
+body.dark-mode button.secondary {
+    background: #374151;
+    color: #e5e7eb;
+}
+
+body.dark-mode .card {
+    background: #111827;
+}
+
+body.dark-mode label,
+body.dark-mode .muted,
+body.dark-mode .guide-list,
+body.dark-mode .user-greeting {
+    color: #9ca3af;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.auth-shell {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.auth-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.auth-forms {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 1fr;
+    margin-top: 20px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.auth-box {
+    background: #f9fafb;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.auth-note {
+    margin-top: 16px;
+    color: var(--muted);
+}
+
+.auth-note a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.auth-note a:hover {
+    text-decoration: underline;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.user-greeting {
+    font-size: 0.95rem;
+    color: var(--muted);
+}
+
+body {
+    margin: 0;
+    font-family: Inter, system-ui, sans-serif;
+    background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
+    color: var(--text);
+}
+
+.app-shell {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: clamp(2rem, 3vw, 3rem);
+}
+
+header p {
+    margin: 12px auto 0;
+    max-width: 680px;
+    color: var(--muted);
+}
+
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.dashboard-cards {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    margin-top: 16px;
+}
+
+.card {
+    background: #f9fafb;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.card h3 {
+    margin-top: 0;
+}
+
+.form-row {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+label {
+    font-size: 0.95rem;
+    color: var(--muted);
+}
+
+input,
+select,
+button {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 0.98rem;
+}
+
+input:focus,
+select:focus,
+button:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14);
+}
+
+button {
+    cursor: pointer;
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+button.primary:hover {
+    background: var(--accent-strong);
+}
+
+button.danger {
+    background: var(--danger);
+}
+
+button.danger:hover {
+    background: #b91c1c;
+}
+
+.schedule-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+button.secondary {
+    background: #e5e7eb;
+    color: var(--text);
+    border-color: transparent;
+}
+
+button.secondary:hover {
+    background: #d1d5db;
+}
+
+.google-btn {
+    width: 100%;
+    background: white;
+    color: #1f2937;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+.google-btn:hover {
+    background: #f3f4f6;
+}
+
+body.dark-mode .google-btn {
+    background: #374151;
+    color: #e5e7eb;
+    border-color: #4b5563;
+}
+
+body.dark-mode .google-btn:hover {
+    background: #4b5563;
+}
+
+.guide-list {
+    padding-left: 20px;
+    margin: 0;
+    color: var(--muted);
+}
+
+.guide-list li {
+    margin-bottom: 10px;
+}
+
+.completed-task strong {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.divider {
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+}
+
+.list-panel {
+    margin-top: 16px;
+}
+
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.list li:last-child {
+    border-bottom: none;
+}
+
+.list li span {
+    color: var(--muted);
+}
+
+.task-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.task-actions button {
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: none;
+    font-size: 0.9rem;
+}
+
+.task-actions button.secondary {
+    background: #e5e7eb;
+    color: var(--text);
+}
+
+.progress-block {
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    border-radius: 999px;
+    background: #e5e7eb;
+    overflow: hidden;
+}
+
+#progressFill {
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #4f46e5, #6366f1);
+    transition: width 0.3s ease;
+}
+
+.schedule-output {
+    margin-top: 16px;
+}
+
+.schedule-output ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.schedule-output li {
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    background: #f9fafb;
+}
+
+@media (max-width: 760px) {
+    .app-shell {
+        padding: 16px;
+    }
+
+    .panel {
+        padding: 16px;
+    }
+}

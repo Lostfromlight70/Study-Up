@@ -1,0 +1,10 @@
+{
+  "name": "student-study-planner",
+  "version": "1.0.0",
+  "description": "Student Study Planner - static frontend with Firebase Auth",
+  "homepage": ".",
+  "license": "MIT",
+  "dependencies": {
+    "firebase": "^12.13.0"
+  }
+}
