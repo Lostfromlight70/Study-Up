@@ -16,6 +16,7 @@ const deadlineListEl = document.getElementById('deadlineList');
 const recommendationTextEl = document.getElementById('recommendationText');
 const taskTitleInput = document.getElementById('taskTitle');
 const dueDateInput = document.getElementById('dueDate');
+const dueTimeInput = document.getElementById('dueTime');
 const estimatedHoursInput = document.getElementById('estimatedHours');
 const taskSubmitBtn = document.querySelector('#taskForm button[type="submit"]');
 const completedCountEl = document.getElementById('completedCount');
@@ -138,10 +139,11 @@ function renderTasks() {
     tasks.forEach(task => {
         const item = document.createElement('li');
         item.className = task.completed ? 'completed-task' : '';
+        const timeDisplay = task.dueTime ? ` at ${task.dueTime}` : '';
         item.innerHTML = `
       <div>
         <strong>${task.title}</strong>
-        <span>${task.subjectName} • due ${formatDate(task.dueDate)} • ${task.hours}h</span>
+        <span>${task.subjectName} • due ${formatDate(task.dueDate)}${timeDisplay} • ${task.hours}h</span>
       </div>
       <div class="task-actions">
         <button class="secondary" data-action="edit" data-id="${task.id}">Edit</button>
@@ -449,7 +451,7 @@ function addSubject(name, priority) {
     generateSchedule();
 }
 
-function addTask(title, subjectId, dueDate, hours) {
+function addTask(title, subjectId, dueDate, hours, dueTime = '') {
     const subject = subjects.find(sub => sub.id === subjectId);
     if (!subject) return;
 
@@ -459,6 +461,7 @@ function addTask(title, subjectId, dueDate, hours) {
         subjectId,
         subjectName: subject.name,
         dueDate,
+        dueTime,
         hours: Number(hours),
         completed: false
     };
@@ -468,7 +471,7 @@ function addTask(title, subjectId, dueDate, hours) {
     generateSchedule();
 }
 
-function updateTask(id, title, subjectId, dueDate, hours) {
+function updateTask(id, title, subjectId, dueDate, hours, dueTime = '') {
     const task = tasks.find(item => item.id === id);
     const subject = subjects.find(sub => sub.id === subjectId);
     if (!task || !subject) return;
@@ -477,6 +480,7 @@ function updateTask(id, title, subjectId, dueDate, hours) {
     task.subjectId = subjectId;
     task.subjectName = subject.name;
     task.dueDate = dueDate;
+    task.dueTime = dueTime;
     task.hours = Number(hours);
     saveState();
     clearEditMode();
@@ -567,13 +571,14 @@ taskForm.addEventListener('submit', event => {
     const title = taskTitleInput.value.trim();
     const subjectId = taskSubjectSelect.value;
     const dueDate = dueDateInput.value;
+    const dueTime = dueTimeInput.value;
     const hours = estimatedHoursInput.value;
     if (!title || !subjectId || !dueDate) return;
 
     if (editingTaskId) {
-        updateTask(editingTaskId, title, subjectId, dueDate, hours);
+        updateTask(editingTaskId, title, subjectId, dueDate, hours, dueTime);
     } else {
-        addTask(title, subjectId, dueDate, hours);
+        addTask(title, subjectId, dueDate, hours, dueTime);
     }
     clearEditMode();
 });
@@ -594,6 +599,7 @@ taskListEl.addEventListener('click', event => {
         taskTitleInput.value = task.title;
         taskSubjectSelect.value = task.subjectId;
         dueDateInput.value = task.dueDate;
+        dueTimeInput.value = task.dueTime || '';
         estimatedHoursInput.value = task.hours;
         taskSubmitBtn.textContent = 'Save Task';
     }
