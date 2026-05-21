@@ -388,6 +388,16 @@ body.dark-mode .google-btn:hover {
     background: #f9fafb;
 }
 
+body.dark-mode .schedule-output li {
+    background: #374151;
+    border-color: #4b5563;
+    color: #e5e7eb;
+}
+
+body.dark-mode .schedule-output li strong {
+    color: #f3f4f6;
+}
+
 @media (max-width: 760px) {
     .app-shell {
         padding: 16px;
