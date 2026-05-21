@@ -188,6 +188,20 @@ header p {
     margin-bottom: 16px;
 }
 
+.form-row.reminder-row {
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+}
+
+.form-row.reminder-row label {
+    margin: 0;
+}
+
+.form-row.reminder-row span {
+    color: var(--muted);
+    padding-left: 0.5rem;
+}
+
 label {
     font-size: 0.95rem;
     color: var(--muted);

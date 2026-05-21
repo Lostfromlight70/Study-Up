@@ -26,6 +26,10 @@ const weeklyHoursInput = document.getElementById('weeklyHours');
 const logoutBtn = document.getElementById('logoutBtn');
 const toggleThemeBtn = document.getElementById('toggleThemeBtn');
 const userGreetingEl = document.getElementById('userGreeting');
+const reminderForm = document.getElementById('reminderForm');
+const reminderMessageInput = document.getElementById('reminderMessage');
+const reminderMinutesInput = document.getElementById('reminderMinutes');
+const reminderListEl = document.getElementById('reminderList');
 
 const STORAGE_KEYS = {
     userProfiles: 'studyPlannerProfiles',
@@ -39,6 +43,8 @@ let profile = { name: '', weeklyHours: 15 };
 let subjects = [];
 let tasks = [];
 let schedule = [];
+let reminders = [];
+let reminderTimeouts = [];
 let editingTaskId = null;
 
 function saveUserProfiles() {
@@ -65,6 +71,7 @@ function saveUserData() {
     userProfiles[currentUserId].subjects = subjects;
     userProfiles[currentUserId].tasks = tasks;
     userProfiles[currentUserId].schedule = schedule;
+    userProfiles[currentUserId].reminders = reminders;
     saveUserProfiles();
 }
 
@@ -83,6 +90,7 @@ function loadState() {
         subjects = user.subjects || [];
         tasks = user.tasks || [];
         schedule = user.schedule || [];
+        reminders = user.reminders || [];
     }
 }
 
@@ -349,6 +357,85 @@ function notifyUpcomingDeadlines() {
     new Notification(title, { body });
 }
 
+function renderReminders() {
+    reminderListEl.innerHTML = '';
+    if (reminders.length === 0) {
+        const item = document.createElement('li');
+        item.textContent = 'No reminders scheduled.';
+        reminderListEl.appendChild(item);
+        return;
+    }
+
+    reminders.sort((a, b) => a.time - b.time).forEach(reminder => {
+        const item = document.createElement('li');
+        const reminderTime = new Date(reminder.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        item.innerHTML = `
+            <div>
+              <strong>${reminder.message}</strong>
+              <span>${reminderTime}</span>
+            </div>
+            <button class="secondary" data-action="cancel" data-id="${reminder.id}">Cancel</button>
+        `;
+        reminderListEl.appendChild(item);
+    });
+}
+
+function schedulePendingReminders() {
+    reminderTimeouts.forEach(timeout => clearTimeout(timeout));
+    reminderTimeouts = [];
+
+    const now = Date.now();
+    reminders = reminders.filter(reminder => reminder.time > now);
+    reminders.forEach(reminder => {
+        const delay = reminder.time - now;
+        const timeoutId = setTimeout(() => {
+            showReminderNotification(reminder);
+            reminders = reminders.filter(item => item.id !== reminder.id);
+            saveState();
+            renderReminders();
+        }, delay);
+        reminderTimeouts.push(timeoutId);
+    });
+    renderReminders();
+}
+
+function showReminderNotification(reminder) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') {
+        alert(`Reminder: ${reminder.message}`);
+        return;
+    }
+    new Notification('Study Planner Reminder', {
+        body: reminder.message
+    });
+}
+
+function addReminder(message, minutes) {
+    const reminder = {
+        id: `reminder-${Date.now()}`,
+        message,
+        time: Date.now() + Number(minutes) * 60 * 1000
+    };
+    reminders.push(reminder);
+    saveState();
+    schedulePendingReminders();
+}
+
+function removeReminder(id) {
+    reminders = reminders.filter(reminder => reminder.id !== id);
+    saveState();
+    schedulePendingReminders();
+}
+
+function handleReminderSubmit(event) {
+    event.preventDefault();
+    const message = reminderMessageInput.value.trim();
+    const minutes = reminderMinutesInput.value;
+    if (!message || !minutes) return;
+    requestNotificationPermission();
+    addReminder(message, minutes);
+    reminderForm.reset();
+}
+
 function addSubject(name, priority) {
     const newSubject = {
         id: `sub-${Date.now()}`,
@@ -491,6 +578,8 @@ taskForm.addEventListener('submit', event => {
     clearEditMode();
 });
 
+reminderForm.addEventListener('submit', handleReminderSubmit);
+
 taskListEl.addEventListener('click', event => {
     const action = event.target.dataset.action;
     const taskId = event.target.dataset.id;
@@ -508,6 +597,13 @@ taskListEl.addEventListener('click', event => {
         estimatedHoursInput.value = task.hours;
         taskSubmitBtn.textContent = 'Save Task';
     }
+});
+
+reminderListEl.addEventListener('click', event => {
+    const action = event.target.dataset.action;
+    const reminderId = event.target.dataset.id;
+    if (!action || !reminderId) return;
+    if (action === 'cancel') removeReminder(reminderId);
 });
 
 subjectListEl.addEventListener('click', event => {
@@ -558,7 +654,8 @@ auth.onAuthStateChanged((user) => {
                 profile: { name: user.displayName || user.email.split('@')[0], weeklyHours: 15 },
                 subjects: [],
                 tasks: [],
-                schedule: []
+                schedule: [],
+                reminders: []
             };
             saveUserProfiles();
             loadState();
@@ -569,8 +666,10 @@ auth.onAuthStateChanged((user) => {
         syncProfile();
         renderSubjects();
         renderTasks();
+        renderReminders();
         generateSchedule();
         renderDashboard();
+        schedulePendingReminders();
         requestNotificationPermission();
         notifyTodaySession();
         notifyUpcomingDeadlines();

@@ -134,6 +134,26 @@
       </section>
 
       <section class="panel">
+        <h2>Study Reminders</h2>
+        <form id="reminderForm">
+          <div class="form-row">
+            <label for="reminderMessage">Reminder message</label>
+            <input type="text" id="reminderMessage" placeholder="Review your next session" required />
+          </div>
+          <div class="form-row reminder-row">
+            <label for="reminderMinutes">Remind me in</label>
+            <input type="number" id="reminderMinutes" min="1" value="30" required />
+            <span>minutes</span>
+          </div>
+          <button type="submit" class="primary">Set Reminder</button>
+        </form>
+        <div class="list-panel">
+          <h3>Active Reminders</h3>
+          <ul id="reminderList" class="list"></ul>
+        </div>
+      </section>
+
+      <section class="panel">
         <h2>Generated Schedule</h2>
         <div class="schedule-actions">
           <button id="generateScheduleBtn" class="primary">Generate / Refresh Schedule</button>
