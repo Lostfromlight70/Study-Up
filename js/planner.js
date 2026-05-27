@@ -25,7 +25,10 @@ const progressFillEl = document.getElementById('progressFill');
 const studentNameInput = document.getElementById('studentName');
 const weeklyHoursInput = document.getElementById('weeklyHours');
 const logoutBtn = document.getElementById('logoutBtn');
-const toggleThemeBtn = document.getElementById('toggleThemeBtn');
+const themeSelect = document.getElementById('themeSelect');
+const customAccentColor = document.getElementById('customAccentColor');
+const customDarkAccentColor = document.getElementById('customDarkAccentColor');
+const customThemeControls = document.getElementById('customThemeControls');
 const userGreetingEl = document.getElementById('userGreeting');
 const reminderForm = document.getElementById('reminderForm');
 const reminderMessageInput = document.getElementById('reminderMessage');
@@ -530,22 +533,177 @@ function logout() {
     });
 }
 
-function applyTheme(theme) {
-    const nextTheme = theme === 'dark' ? 'dark' : 'light';
-    document.body.classList.toggle('dark-mode', nextTheme === 'dark');
-    toggleThemeBtn.textContent = nextTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
-    localStorage.setItem(STORAGE_KEYS.theme, nextTheme);
+function setThemeControls(themeConfig) {
+    const themeName = themeConfig?.name || 'light';
+    themeSelect.value = themeName;
+    customAccentColor.value = themeConfig?.accentColor || '#4f46e5';
+    customDarkAccentColor.value = themeConfig?.darkAccentColor || '#1f2937';
+    const customWrapper = document.querySelector('.custom-accent-wrapper');
+    const darkWrapper = document.querySelector('.custom-dark-accent-wrapper');
+    const showControls = themeName === 'custom' || themeName === 'dark';
+    customThemeControls.style.display = showControls ? 'flex' : 'none';
+    if (customWrapper) customWrapper.style.display = themeName === 'custom' ? 'flex' : 'none';
+    if (darkWrapper) darkWrapper.style.display = themeName === 'dark' ? 'flex' : 'none';
 }
 
-function toggleTheme() {
-    const isDark = document.body.classList.contains('dark-mode');
-    applyTheme(isDark ? 'light' : 'dark');
+function lightenHexColor(hex, amount) {
+    const normalized = hex.replace('#', '');
+    const num = parseInt(normalized, 16);
+    const r = Math.min(255, Math.round(((num >> 16) & 0xff) + (255 - ((num >> 16) & 0xff)) * amount));
+    const g = Math.min(255, Math.round((((num >> 8) & 0xff) + (255 - ((num >> 8) & 0xff)) * amount)));
+    const b = Math.min(255, Math.round(((num & 0xff) + (255 - (num & 0xff)) * amount)));
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+}
+
+function darkenHexColor(hex, amount) {
+    const normalized = hex.replace('#', '');
+    const num = parseInt(normalized, 16);
+    const r = Math.max(0, Math.round(((num >> 16) & 0xff) * (1 - amount)));
+    const g = Math.max(0, Math.round((((num >> 8) & 0xff) * (1 - amount))));
+    const b = Math.max(0, Math.round(((num & 0xff) * (1 - amount))));
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+}
+
+function hexToRgb(hex) {
+    const h = hex.replace('#', '');
+    const bigint = parseInt(h, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `${r}, ${g}, ${b}`;
+}
+
+function clearThemeOverrides() {
+    const root = document.documentElement;
+    const customVars = [
+        '--custom-accent',
+        '--custom-border',
+        '--custom-secondary-bg',
+        '--custom-secondary-text',
+        '--custom-text',
+        '--custom-muted',
+        '--custom-panel',
+        '--custom-bg'
+    ];
+    customVars.forEach(name => root.style.removeProperty(name));
+
+    const darkVars = [
+        '--accent',
+        '--accent-strong',
+        '--border',
+        '--secondary-bg',
+        '--secondary-text'
+    ];
+    darkVars.forEach(name => root.style.removeProperty(name));
+    // also clear any overrides set on the body element
+    const body = document.body;
+    if (body) {
+        customVars.forEach(name => body.style.removeProperty(name));
+        darkVars.forEach(name => body.style.removeProperty(name));
+        body.style.removeProperty('--dark-accent');
+        body.style.removeProperty('--dark-accent-strong');
+        body.style.removeProperty('--accent-rgb');
+        body.style.removeProperty('--custom-accent-rgb');
+    }
+}
+
+function applyTheme(themeConfig, persist = true) {
+    const themeName = themeConfig?.name || 'light';
+    document.body.className = document.body.className
+        .split(' ')
+        .filter(c => !c.startsWith('theme-'))
+        .concat(`theme-${themeName}`)
+        .join(' ');
+
+    clearThemeOverrides();
+
+    const accent = themeConfig?.accentColor || '#4f46e5';
+    const darkAccent = themeConfig?.darkAccentColor || '#1f2937';
+
+    const accentRgb = hexToRgb(accent);
+    const darkAccentRgb = hexToRgb(darkAccent);
+
+    // Always set dark-accent RGB for potential use
+    document.documentElement.style.setProperty('--dark-accent-rgb', darkAccentRgb);
+
+    const body = document.body;
+    if (themeName === 'custom') {
+        // set custom variables on body so they override theme-level defaults
+        if (body) {
+            body.style.setProperty('--custom-accent', accent);
+            body.style.setProperty('--custom-accent-rgb', accentRgb);
+            body.style.setProperty('--custom-border', lightenHexColor(accent, 0.5));
+            body.style.setProperty('--custom-secondary-bg', lightenHexColor(accent, 0.88));
+            body.style.setProperty('--custom-secondary-text', '#1f2937');
+            body.style.setProperty('--custom-text', '#1f2937');
+            body.style.setProperty('--custom-muted', '#6b7280');
+            body.style.setProperty('--custom-panel', '#ffffff');
+            body.style.setProperty('--custom-bg', lightenHexColor(accent, 0.82));
+            body.style.setProperty('--accent-rgb', accentRgb);
+        } else {
+            document.documentElement.style.setProperty('--custom-accent', accent);
+        }
+    }
+
+    if (themeName === 'dark') {
+        // set dark accent variables on the body element so they take precedence
+        if (body) {
+            body.style.setProperty('--dark-accent', darkAccent);
+            body.style.setProperty('--dark-accent-strong', darkenHexColor(darkAccent, 0.15));
+            body.style.setProperty('--accent', darkAccent);
+            body.style.setProperty('--accent-strong', darkenHexColor(darkAccent, 0.15));
+            body.style.setProperty('--accent-rgb', darkAccentRgb);
+            body.style.setProperty('--border', darkenHexColor(darkAccent, 0.45));
+            body.style.setProperty('--secondary-bg', darkenHexColor(darkAccent, 0.75));
+            body.style.setProperty('--secondary-text', '#e5e7eb');
+        } else {
+            document.documentElement.style.setProperty('--dark-accent', darkAccent);
+        }
+    }
+
+    setThemeControls(themeConfig);
+    if (persist) {
+        localStorage.setItem(STORAGE_KEYS.theme, JSON.stringify(themeConfig));
+    }
 }
 
 function loadTheme() {
-    const theme = localStorage.getItem(STORAGE_KEYS.theme) || 'light';
-    applyTheme(theme);
+    let themeConfig = { name: 'light', accentColor: '#4f46e5' };
+    const storedTheme = localStorage.getItem(STORAGE_KEYS.theme);
+    try {
+        if (storedTheme) {
+            themeConfig = JSON.parse(storedTheme);
+        }
+    } catch (err) {
+        console.warn('Failed to parse stored theme config, resetting to default.', err);
+    }
+    applyTheme(themeConfig, true);
 }
+
+function getPreviewThemeConfig() {
+    return {
+        name: themeSelect.value,
+        accentColor: customAccentColor.value,
+        darkAccentColor: customDarkAccentColor.value
+    };
+}
+
+themeSelect.addEventListener('change', () => {
+    const themeConfig = getPreviewThemeConfig();
+    applyTheme(themeConfig, true);
+});
+
+customAccentColor.addEventListener('input', () => {
+    if (themeSelect.value === 'custom') {
+        applyTheme(getPreviewThemeConfig(), true);
+    }
+});
+
+customDarkAccentColor.addEventListener('input', () => {
+    if (themeSelect.value === 'dark') {
+        applyTheme(getPreviewThemeConfig(), true);
+    }
+});
 
 profileForm.addEventListener('submit', event => {
     event.preventDefault();
@@ -636,51 +794,85 @@ resetBtn.addEventListener('click', () => {
 });
 
 logoutBtn.addEventListener('click', logout);
-if (toggleThemeBtn) {
-    toggleThemeBtn.addEventListener('click', toggleTheme);
-} else {
-    console.warn('Toggle theme button not found.');
-}
 
 loadTheme();
 
 // Check Firebase authentication and load planner
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        // User is logged in
-        saveCurrentUser(user.uid);
-        loadState();
+// Demo mode for UI testing - enable if demoMode query param is set
+const urlParams = new URLSearchParams(window.location.search);
+const DEMO_MODE = urlParams.get('demo') === 'true' || localStorage.getItem('demoMode') === 'true';
+const mockUser = {
+    uid: 'demo-user-123',
+    email: 'demo@example.com',
+    displayName: 'Demo User'
+};
 
-        // Ensure user profile exists
-        if (!userProfiles[user.uid]) {
-            userProfiles[user.uid] = {
-                uid: user.uid,
-                name: user.displayName || user.email.split('@')[0],
-                email: user.email,
-                profile: { name: user.displayName || user.email.split('@')[0], weeklyHours: 15 },
-                subjects: [],
-                tasks: [],
-                schedule: [],
-                reminders: []
-            };
-            saveUserProfiles();
-            loadState();
-        }
-
-        loadTheme();
-        clearEditMode();
-        syncProfile();
-        renderSubjects();
-        renderTasks();
-        renderReminders();
-        generateSchedule();
-        renderDashboard();
-        schedulePendingReminders();
-        requestNotificationPermission();
-        notifyTodaySession();
-        notifyUpcomingDeadlines();
-    } else {
-        // User is not logged in
-        window.location.href = 'login.html';
+if (DEMO_MODE) {
+    // Load in demo mode without waiting for Firebase
+    saveCurrentUser(mockUser.uid);
+    if (!userProfiles[mockUser.uid]) {
+        userProfiles[mockUser.uid] = {
+            uid: mockUser.uid,
+            name: mockUser.displayName,
+            email: mockUser.email,
+            profile: { name: mockUser.displayName, weeklyHours: 15 },
+            subjects: [],
+            tasks: [],
+            schedule: [],
+            reminders: []
+        };
+        saveUserProfiles();
     }
-});
+    loadTheme();
+    clearEditMode();
+    syncProfile();
+    renderSubjects();
+    renderTasks();
+    renderReminders();
+    generateSchedule();
+    renderDashboard();
+    schedulePendingReminders();
+    requestNotificationPermission();
+    notifyTodaySession();
+    notifyUpcomingDeadlines();
+} else {
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            // User is logged in
+            saveCurrentUser(user.uid);
+            loadState();
+
+            // Ensure user profile exists
+            if (!userProfiles[user.uid]) {
+                userProfiles[user.uid] = {
+                    uid: user.uid,
+                    name: user.displayName || user.email.split('@')[0],
+                    email: user.email,
+                    profile: { name: user.displayName || user.email.split('@')[0], weeklyHours: 15 },
+                    subjects: [],
+                    tasks: [],
+                    schedule: [],
+                    reminders: []
+                };
+                saveUserProfiles();
+                loadState();
+            }
+
+            loadTheme();
+            clearEditMode();
+            syncProfile();
+            renderSubjects();
+            renderTasks();
+            renderReminders();
+            generateSchedule();
+            renderDashboard();
+            schedulePendingReminders();
+            requestNotificationPermission();
+            notifyTodaySession();
+            notifyUpcomingDeadlines();
+        } else {
+            // User is not logged in
+            window.location.href = 'login.html';
+        }
+    });
+}

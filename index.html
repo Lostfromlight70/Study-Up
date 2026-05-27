@@ -18,7 +18,27 @@
         </div>
         <div class="header-actions">
           <span id="userGreeting" class="user-greeting"></span>
-          <button id="toggleThemeBtn" class="secondary">Dark Mode</button>
+          <div class="theme-settings">
+            <label for="themeSelect">Theme</label>
+            <select id="themeSelect">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="ocean">Ocean</option>
+              <option value="sunset">Sunset</option>
+              <option value="mint">Mint</option>
+              <option value="custom">Custom Accent</option>
+            </select>
+            <div id="customThemeControls" class="custom-theme-controls">
+              <div class="custom-accent-wrapper custom-color-swatch">
+                <label for="customAccentColor">Accent</label>
+                <input type="color" id="customAccentColor" value="#4f46e5" title="Choose accent color" />
+              </div>
+              <div class="custom-dark-accent-wrapper custom-color-swatch custom-dark-swatch">
+                <label for="customDarkAccentColor">Dark Accent</label>
+                <input type="color" id="customDarkAccentColor" value="#1f2937" title="Choose dark accent color" />
+              </div>
+            </div>
+          </div>
           <button id="logoutBtn" class="secondary">Logout</button>
         </div>
       </div>
