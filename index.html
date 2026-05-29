@@ -23,19 +23,28 @@
             <select id="themeSelect">
               <option value="light">Light</option>
               <option value="dark">Dark</option>
-              <option value="ocean">Ocean</option>
-              <option value="sunset">Sunset</option>
-              <option value="mint">Mint</option>
+              <option value="midnight">Midnight</option>
+              <option value="amber">Amber</option>
+              <option value="sage">Sage</option>
+              <option value="focus">Focus</option>
               <option value="custom">Custom Accent</option>
             </select>
             <div id="customThemeControls" class="custom-theme-controls">
-              <div class="custom-accent-wrapper custom-color-swatch">
-                <label for="customAccentColor">Accent</label>
-                <input type="color" id="customAccentColor" value="#4f46e5" title="Choose accent color" />
+              <div class="custom-swatch-group">
+                <div class="custom-color-swatch">
+                  <div id="accentPreview" class="color-preview"></div>
+                  <input type="color" id="customAccentColor" value="#4f46e5" title="Choose accent color"
+                    aria-label="Accent color picker" />
+                </div>
+                <span class="swatch-label">Accent</span>
               </div>
-              <div class="custom-dark-accent-wrapper custom-color-swatch custom-dark-swatch">
-                <label for="customDarkAccentColor">Dark Accent</label>
-                <input type="color" id="customDarkAccentColor" value="#1f2937" title="Choose dark accent color" />
+              <div class="custom-swatch-group">
+                <div class="custom-color-swatch">
+                  <div id="surfacePreview" class="color-preview"></div>
+                  <input type="color" id="customSurfaceColor" value="#eef2ff" title="Choose surface color"
+                    aria-label="Surface color picker" />
+                </div>
+                <span class="swatch-label">Surface</span>
               </div>
             </div>
           </div>
@@ -192,21 +201,6 @@
 
   <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-auth-compat.js"></script>
-  <script>
-    // Initialize Firebase (CDN version)
-    const firebaseConfig = {
-      apiKey: "AIzaSyCfBQI_rn2PhNZV1dI9uHGSvLNB5nCuefE",
-      authDomain: "soft-ahh.firebaseapp.com",
-      projectId: "soft-ahh",
-      storageBucket: "soft-ahh.firebasestorage.app",
-      messagingSenderId: "792389467882",
-      appId: "1:792389467882:web:bf54bf072d1bbb9cc72193"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    window.firebaseAuth = firebase.auth();
-  </script>
-
   <script type="module" src="js/planner.js"></script>
 </body>
 

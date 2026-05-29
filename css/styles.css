@@ -5,13 +5,17 @@
     --muted: #6b7280;
     --accent: #4f46e5;
     --accent-strong: #4338ca;
+    --accent-rgb: 79, 70, 229;
     --danger: #dc2626;
     --border: #e5e7eb;
     --secondary-bg: #e5e7eb;
     --secondary-text: #1f2937;
+    --input-bg: #ffffff;
+    --input-text: #1f2937;
     --custom-accent: #4f46e5;
     --custom-bg: #eef2ff;
     --custom-panel: #ffffff;
+    --custom-elevated: #ffffff;
     --custom-text: #1f2937;
     --custom-muted: #6b7280;
     --custom-border: #e5e7eb;
@@ -42,50 +46,62 @@ body.theme-dark {
     --secondary-text: #e5e7eb;
 }
 
+body.theme-midnight,
 body.theme-ocean {
-    --bg: #eff6ff;
-    --panel: #ffffff;
-    --text: #0f172a;
-    --muted: #475569;
-    --accent: #0ea5e9;
-    --accent-strong: #0369a1;
-    --danger: #ef4444;
-    --border: #cbd5e1;
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #06b6d4;
+    --accent-strong: #0891b2;
+    --danger: #f87171;
+    --border: #334155;
+    --secondary-bg: #111827;
+    --secondary-text: #cbd5e1;
 }
 
+body.theme-amber,
 body.theme-sunset {
     --bg: #fff7ed;
     --panel: #ffffff;
-    --text: #1f2937;
-    --muted: #6b7280;
+    --text: #7c2d12;
+    --muted: #a16207;
     --accent: #f97316;
-    --accent-strong: #c2410c;
+    --accent-strong: #ea580c;
     --danger: #dc2626;
-    --border: #f3e8ff;
+    --border: #fed7aa;
+    --secondary-bg: #ffedd5;
+    --secondary-text: #92400e;
 }
 
+body.theme-sage,
 body.theme-mint {
-    --bg: #ecfdf5;
+    --bg: #f0fdf4;
     --panel: #ffffff;
-    --text: #0f172a;
+    --text: #14532d;
     --muted: #4b5563;
-    --accent: #22c55e;
-    --accent-strong: #15803d;
+    --accent: #15803d;
+    --accent-strong: #166534;
     --danger: #dc2626;
-    --border: #d9f99d;
+    --border: #bbf7d0;
+    --secondary-bg: #dcfce7;
+    --secondary-text: #0f766e;
 }
 
 body.theme-custom {
     --bg: var(--custom-bg);
     --panel: var(--custom-panel);
+    --elevated: var(--custom-elevated);
     --text: var(--custom-text);
     --muted: var(--custom-muted);
     --accent: var(--custom-accent);
-    --accent-strong: var(--custom-accent);
+    --accent-strong: var(--custom-accent-strong);
     --danger: #dc2626;
     --border: var(--custom-border);
     --secondary-bg: var(--custom-secondary-bg);
     --secondary-text: var(--custom-secondary-text);
+    --input-bg: var(--custom-panel);
+    --input-text: var(--custom-text);
 }
 
 .hidden {
@@ -214,26 +230,47 @@ header h1 {
 }
 
 .custom-color-swatch {
-    display: inline-grid;
-    place-items: center;
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
-    min-height: 34px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     border: 2px solid var(--border);
     background: var(--panel);
     position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.custom-color-swatch:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.18);
 }
 
 .custom-color-swatch input[type="color"] {
-    width: 38px;
-    height: 38px;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
     border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.custom-color-swatch .color-preview {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    border-radius: 50%;
+    background: var(--panel);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .custom-color-swatch label {
@@ -243,8 +280,30 @@ header h1 {
 .custom-theme-controls {
     display: none;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    padding: 6px 10px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
     margin-left: 4px;
+    flex-wrap: wrap;
+}
+
+.custom-theme-controls.visible {
+    display: flex;
+}
+
+.custom-swatch-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.swatch-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
 }
 
 header p {
@@ -254,7 +313,7 @@ header p {
 }
 
 .panel {
-    background: var(--panel);
+    background: var(--elevated, var(--panel));
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: 20px;
@@ -280,6 +339,7 @@ header p {
     background: var(--panel);
     border-radius: 14px;
     padding: 16px;
+    border: 1px solid var(--border);
 }
 
 .card h3 {
@@ -320,6 +380,13 @@ button {
     font-size: 0.98rem;
 }
 
+input,
+select,
+textarea {
+    background: var(--input-bg);
+    color: var(--input-text);
+}
+
 input:focus,
 select:focus,
 button:focus {
@@ -352,7 +419,7 @@ button.danger:hover {
 #resetDataBtn {
     background: rgb(220, 20, 20);
     color: white;
-    border-color: rgba(0,0,0,0.08);
+    border-color: rgba(0, 0, 0, 0.08);
 }
 
 #resetDataBtn:hover {
@@ -427,12 +494,15 @@ button.secondary:hover {
     display: flex;
     justify-content: space-between;
     gap: 12px;
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--border);
+    padding: 14px 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 10px;
 }
 
 .list li:last-child {
-    border-bottom: none;
+    margin-bottom: 0;
 }
 
 .list li span {

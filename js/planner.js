@@ -1,5 +1,4 @@
-// Firebase auth via CDN (loaded in index.html)
-const auth = window.firebaseAuth;
+import { auth } from './firebase.js';
 
 const profileForm = document.getElementById('profileForm');
 const subjectForm = document.getElementById('subjectForm');
@@ -27,7 +26,9 @@ const weeklyHoursInput = document.getElementById('weeklyHours');
 const logoutBtn = document.getElementById('logoutBtn');
 const themeSelect = document.getElementById('themeSelect');
 const customAccentColor = document.getElementById('customAccentColor');
-const customDarkAccentColor = document.getElementById('customDarkAccentColor');
+const customSurfaceColor = document.getElementById('customSurfaceColor');
+const accentPreview = document.getElementById('accentPreview');
+const surfacePreview = document.getElementById('surfacePreview');
 const customThemeControls = document.getElementById('customThemeControls');
 const userGreetingEl = document.getElementById('userGreeting');
 const reminderForm = document.getElementById('reminderForm');
@@ -535,15 +536,39 @@ function logout() {
 
 function setThemeControls(themeConfig) {
     const themeName = themeConfig?.name || 'light';
+    const showCustomControls = themeName === 'custom';
     themeSelect.value = themeName;
     customAccentColor.value = themeConfig?.accentColor || '#4f46e5';
-    customDarkAccentColor.value = themeConfig?.darkAccentColor || '#1f2937';
-    const customWrapper = document.querySelector('.custom-accent-wrapper');
-    const darkWrapper = document.querySelector('.custom-dark-accent-wrapper');
-    const showControls = themeName === 'custom' || themeName === 'dark';
-    customThemeControls.style.display = showControls ? 'flex' : 'none';
-    if (customWrapper) customWrapper.style.display = themeName === 'custom' ? 'flex' : 'none';
-    if (darkWrapper) darkWrapper.style.display = themeName === 'dark' ? 'flex' : 'none';
+    customSurfaceColor.value = themeConfig?.surfaceColor || '#eef2ff';
+    accentPreview.style.backgroundColor = customAccentColor.value;
+    surfacePreview.style.backgroundColor = customSurfaceColor.value;
+    customThemeControls.classList.toggle('visible', showCustomControls);
+}
+
+function isLightColor(hex) {
+    const normalized = hex.replace('#', '');
+    const r = parseInt(normalized.slice(0, 2), 16);
+    const g = parseInt(normalized.slice(2, 4), 16);
+    const b = parseInt(normalized.slice(4, 6), 16);
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return yiq >= 128;
+}
+
+function adjustLightness(hex, delta) {
+    const normalized = hex.replace('#', '');
+    let r = parseInt(normalized.slice(0, 2), 16) / 255;
+    let g = parseInt(normalized.slice(2, 4), 16) / 255;
+    let b = parseInt(normalized.slice(4, 6), 16) / 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const l = (max + min) / 2;
+    const newL = Math.max(0, Math.min(100, (l * 100) + delta)) / 100;
+    const scale = l === 0 ? 0 : newL / l;
+    r = Math.min(1, r * scale);
+    g = Math.min(1, g * scale);
+    b = Math.min(1, b * scale);
+    const toHex = n => Math.round(n * 255).toString(16).padStart(2, '0');
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
 function lightenHexColor(hex, amount) {
@@ -618,27 +643,33 @@ function applyTheme(themeConfig, persist = true) {
     clearThemeOverrides();
 
     const accent = themeConfig?.accentColor || '#4f46e5';
+    const surface = themeConfig?.surfaceColor || '#eef2ff';
     const darkAccent = themeConfig?.darkAccentColor || '#1f2937';
-
     const accentRgb = hexToRgb(accent);
     const darkAccentRgb = hexToRgb(darkAccent);
-
-    // Always set dark-accent RGB for potential use
-    document.documentElement.style.setProperty('--dark-accent-rgb', darkAccentRgb);
+    const isLightSurface = isLightColor(surface);
+    const panelSurface = isLightSurface ? lightenHexColor(surface, 0.12) : adjustLightness(surface, 12);
+    const elevatedSurface = isLightSurface ? '#ffffff' : adjustLightness(surface, 20);
+    const borderSurface = isLightSurface ? lightenHexColor(surface, 0.20) : adjustLightness(surface, 25);
+    const secondarySurface = isLightSurface ? lightenHexColor(surface, 0.08) : adjustLightness(surface, 8);
+    const textColor = isLightSurface ? '#1f2937' : '#e5e7eb';
+    const mutedColor = isLightSurface ? '#4b5563' : '#94a3b8';
+    const accentStrong = darkenHexColor(accent, 0.15);
 
     const body = document.body;
     if (themeName === 'custom') {
-        // set custom variables on body so they override theme-level defaults
         if (body) {
             body.style.setProperty('--custom-accent', accent);
+            body.style.setProperty('--custom-accent-strong', accentStrong);
             body.style.setProperty('--custom-accent-rgb', accentRgb);
-            body.style.setProperty('--custom-border', lightenHexColor(accent, 0.5));
-            body.style.setProperty('--custom-secondary-bg', lightenHexColor(accent, 0.88));
-            body.style.setProperty('--custom-secondary-text', '#1f2937');
-            body.style.setProperty('--custom-text', '#1f2937');
-            body.style.setProperty('--custom-muted', '#6b7280');
-            body.style.setProperty('--custom-panel', '#ffffff');
-            body.style.setProperty('--custom-bg', lightenHexColor(accent, 0.82));
+            body.style.setProperty('--custom-bg', surface);
+            body.style.setProperty('--custom-panel', panelSurface);
+            body.style.setProperty('--custom-elevated', elevatedSurface);
+            body.style.setProperty('--custom-text', textColor);
+            body.style.setProperty('--custom-muted', mutedColor);
+            body.style.setProperty('--custom-border', borderSurface);
+            body.style.setProperty('--custom-secondary-bg', secondarySurface);
+            body.style.setProperty('--custom-secondary-text', textColor);
             body.style.setProperty('--accent-rgb', accentRgb);
         } else {
             document.documentElement.style.setProperty('--custom-accent', accent);
@@ -668,7 +699,7 @@ function applyTheme(themeConfig, persist = true) {
 }
 
 function loadTheme() {
-    let themeConfig = { name: 'light', accentColor: '#4f46e5' };
+    let themeConfig = { name: 'light', accentColor: '#4f46e5', surfaceColor: '#eef2ff' };
     const storedTheme = localStorage.getItem(STORAGE_KEYS.theme);
     try {
         if (storedTheme) {
@@ -681,11 +712,13 @@ function loadTheme() {
 }
 
 function getPreviewThemeConfig() {
-    return {
-        name: themeSelect.value,
-        accentColor: customAccentColor.value,
-        darkAccentColor: customDarkAccentColor.value
-    };
+    const themeName = themeSelect.value;
+    const config = { name: themeName };
+    if (themeName === 'custom') {
+        config.accentColor = customAccentColor.value;
+        config.surfaceColor = customSurfaceColor.value;
+    }
+    return config;
 }
 
 themeSelect.addEventListener('change', () => {
@@ -694,13 +727,15 @@ themeSelect.addEventListener('change', () => {
 });
 
 customAccentColor.addEventListener('input', () => {
+    accentPreview.style.backgroundColor = customAccentColor.value;
     if (themeSelect.value === 'custom') {
         applyTheme(getPreviewThemeConfig(), true);
     }
 });
 
-customDarkAccentColor.addEventListener('input', () => {
-    if (themeSelect.value === 'dark') {
+customSurfaceColor.addEventListener('input', () => {
+    surfacePreview.style.backgroundColor = customSurfaceColor.value;
+    if (themeSelect.value === 'custom') {
         applyTheme(getPreviewThemeConfig(), true);
     }
 });
@@ -832,7 +867,6 @@ if (DEMO_MODE) {
     generateSchedule();
     renderDashboard();
     schedulePendingReminders();
-    requestNotificationPermission();
     notifyTodaySession();
     notifyUpcomingDeadlines();
 } else {
@@ -867,7 +901,6 @@ if (DEMO_MODE) {
             generateSchedule();
             renderDashboard();
             schedulePendingReminders();
-            requestNotificationPermission();
             notifyTodaySession();
             notifyUpcomingDeadlines();
         } else {
